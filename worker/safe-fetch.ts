@@ -9,7 +9,7 @@ export async function publicTarget(raw: string) {
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
-  if (!hosts.includes(url.hostname.toLowerCase()))
+  if (process.env.INGESTION_PUBLIC_SOURCES !== "true" && !hosts.includes(url.hostname.toLowerCase()))
     throw new Error("UNSUPPORTED: Host awaits administrator approval");
   const addresses = await dns.lookup(url.hostname, { all: true });
   if (

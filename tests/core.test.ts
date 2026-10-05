@@ -89,10 +89,20 @@ test("JSON-LD refuses sale/nightly/unqualified offers and partial pages stay par
   assert.ok(x.units[0].sqft! > 750);
 });
 test("unapproved hosts, credentials and insecure protocols are rejected before fetching", async () => {
+  process.env.INGESTION_PUBLIC_SOURCES = "false";
   process.env.INGESTION_ALLOWED_HOSTS = "example.com";
   await assert.rejects(publicTarget("https://127.0.0.1"), /approval/);
   await assert.rejects(publicTarget("http://example.com"), /HTTPS/);
   await assert.rejects(publicTarget("https://user:pass@example.com"), /HTTPS/);
+});
+test("public-source mode still rejects private addresses and nonstandard ports", async () => {
+  process.env.INGESTION_PUBLIC_SOURCES = "true";
+  try {
+    await assert.rejects(publicTarget("https://127.0.0.1"), /Private or reserved/);
+    await assert.rejects(publicTarget("https://10.0.0.1"), /Private or reserved/);
+    await assert.rejects(publicTarget("https://169.254.169.254"), /Private or reserved/);
+    await assert.rejects(publicTarget("https://example.com:8443"), /HTTPS/);
+  } finally { process.env.INGESTION_PUBLIC_SOURCES = "false"; }
 });
 test("parser omissions never turn a complete-looking page into empty inventory", () => {
   assert.throws(

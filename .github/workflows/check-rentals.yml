@@ -20,6 +20,7 @@ jobs:
       APP_URL: ${{ vars.APP_URL }}
       INGESTION_ALLOWED_HOSTS: ${{ vars.INGESTION_ALLOWED_HOSTS || secrets.INGESTION_ALLOWED_HOSTS }}
       ENABLE_BROWSER: "false"
+      INGESTION_PUBLIC_SOURCES: "true"
       WORKER_ONCE: "true"
       WORKER_BUDGET_MINUTES: "10"
     steps:
