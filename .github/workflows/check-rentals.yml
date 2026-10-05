@@ -18,7 +18,7 @@ jobs:
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       ALERT_FROM: ${{ vars.ALERT_FROM }}
       APP_URL: ${{ vars.APP_URL }}
-      INGESTION_ALLOWED_HOSTS: ${{ vars.INGESTION_ALLOWED_HOSTS }}
+      INGESTION_ALLOWED_HOSTS: ${{ vars.INGESTION_ALLOWED_HOSTS || secrets.INGESTION_ALLOWED_HOSTS }}
       ENABLE_BROWSER: "false"
       WORKER_ONCE: "true"
       WORKER_BUDGET_MINUTES: "10"
@@ -33,3 +33,4 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm worker
+
