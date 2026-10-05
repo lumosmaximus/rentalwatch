@@ -1,0 +1,24 @@
+name: Cloudflare compatibility check
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://maqfqafjvlzddkffsojm.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_7f0wFWfnUKR16Cg_umFRNA_Uma_w9fk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run cf:build
+      - run: pnpm exec wrangler deploy --dry-run
