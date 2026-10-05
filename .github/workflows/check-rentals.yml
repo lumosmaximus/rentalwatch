@@ -1,0 +1,35 @@
+name: Daily rental check
+on:
+  schedule:
+    - cron: "17 16 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rental-worker
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      ALERT_FROM: ${{ vars.ALERT_FROM }}
+      APP_URL: ${{ vars.APP_URL }}
+      INGESTION_ALLOWED_HOSTS: ${{ vars.INGESTION_ALLOWED_HOSTS }}
+      ENABLE_BROWSER: "false"
+      WORKER_ONCE: "true"
+      WORKER_BUDGET_MINUTES: "10"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm worker
